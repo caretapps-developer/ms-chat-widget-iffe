@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat Widget Host Example</title>
+    <style>body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; }</style>
+  </head>
+  <body>
+    <h1>Chat Widget Host Example</h1>
+    <p>This page loads the IIFE bundle and mounts the widget.</p>
+
+    <script src="dist/chat-widget.js"></script>
+    <script>
+      ChatWidget.mount({
+        id: "user-12345",
+        theme: { accent: "#ff5722", bg: "#fff8f0" },
+        onSendMessage: async (text, { id }) => {
+          // Demo: just echo back
+          return "Echo: " + text + " (" + id + ")";
+        }
+      });
+    </script>
+  </body>
+</html>
+

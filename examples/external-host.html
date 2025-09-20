@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>External Site — Chat Widget Embed</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; }
+      .container { max-width: 720px; margin: 0 auto; }
+      .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(2,6,23,0.08); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>External Website</h1>
+      <p>This page simulates a third-party site embedding the chat widget via a single script tag.</p>
+      <div class="card">
+        <h2>Product Page</h2>
+        <p>Here is some normal page content. The chat button should appear in the bottom-right corner.</p>
+      </div>
+    </div>
+
+    <!-- The IIFE bundle built in ../dist (relative to this file) -->
+    <script src="../dist/chat-widget.js"></script>
+    <script>
+      // Mount the widget with options provided by the external site
+      ChatWidget.mount({
+        id: "ext-user-42",
+        theme: { accent: "#0b84ff", bg: "#ffffff" },
+        onSendMessage: async (text, { id }) => {
+          // Simulate a server call; replace with your API call as needed
+          await new Promise(r => setTimeout(r, 200));
+          return `Thanks, ${id}! You said: "${text}"`;
+        }
+      });
+    </script>
+  </body>
+</html>
+
