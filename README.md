@@ -200,4 +200,30 @@ Tips for new widgets:
 - Add telemetry hooks (open/close, send, response) for analytics
 - Extract a small theming system and publish preset themes
 
+
+### Project next steps (recommended roadmap)
+- Automate builds and releases (CI/CD)
+  - Add a GitHub Actions workflow that on tag push (e.g., v*) runs `npm ci && npm run build` and uploads `dist/chat-widget.js` as a release asset
+  - Optionally publish the bundle to GitHub Pages or your CDN on release
+- Versioning & changelog
+  - Adopt Conventional Commits and generate a CHANGELOG on each release
+  - Use annotated git tags (e.g., v0.1.0) to trigger releases
+- Multiple widgets from one repo
+  - Add a second widget (e.g., SupportWidget) and either expose a second global or create a separate entry in esbuild (multi-entry build)
+  - Keep shared utilities in `src/shared/` to reduce duplication
+- UX improvements
+  - Dark theme toggle, typing indicator, loading/disabled state on send, error/retry handling
+  - Optional localStorage persistence of recent messages per session
+- Hardening & security
+  - Provide SRI hash instructions for the `<script>` tag
+  - Document CSP requirements (e.g., allow your CDN host; consider `unsafe-inline` only if you inject inline styles)
+  - Namespace globals to avoid collisions (keep using `window.ChatWidget`)
+- Docs
+  - Create a docs/ folder with short guides: embedding, theming, extending, releasing
+  - Include copy-paste snippets for common frameworks (Next.js/React, plain HTML, Shopify, etc.)
+- Testing
+  - Add unit tests (e.g., Testing Library + Jest/Vitest) for open/close, send flow, and theme rendering
+- Distribution options
+  - Keep IIFE as the main CDN artifact; optionally add UMD/ESM builds if you want npm distribution for app bundlers
+
 Happy building! 🎉
