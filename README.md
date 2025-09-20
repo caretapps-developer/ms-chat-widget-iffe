@@ -219,6 +219,39 @@ Tips for future releases:
   ```
 
 
+
+## GitHub Pages deployment (latest builds) — why and how
+GitHub Pages gives you a public URL that always reflects the latest build from `main`. This is perfect for demos, QA, and quick shareable links. It complements Releases (which are versioned and immutable).
+
+Why use both?
+- Pages = “latest” (auto-updates on push to `main`)
+- Releases = “versioned & immutable” (built on tag `vX.Y.Z` and attached as an asset)
+
+What is published to Pages
+- `dist/chat-widget.js` (the embeddable bundle)
+- `examples/external-host.html` (demo page)
+- `index.html` (root demo)
+
+When it runs
+- On push to `main`
+- On manual trigger (Workflow Dispatch)
+
+One‑time setup
+- GitHub → Repository Settings → Pages → Source: GitHub Actions (enable)
+
+Public URLs
+- See “Direct URLs to the built bundle (dist)” below for Pages links
+
+Recommended development flow
+1) Develop locally: `npm run build`, test `examples/external-host.html`
+2) Push to `main`: Pages publishes the latest bundle & demo for easy sharing
+3) Ready to ship: tag a version (e.g., `v0.2.0`) → Release workflow builds and attaches `dist/chat-widget.js` to the GitHub Release (immutable URL)
+4) Optional: upload the release artifact to your CDN for production serving
+
+Notes
+- Prefer Release (versioned) URLs for production embeds; use Pages for previews and QA.
+- If you need cache control, a dedicated CDN is recommended for production.
+
 ### Direct URLs to the built bundle (dist)
 - Local (development):
   - http://localhost:8080/dist/chat-widget.js
