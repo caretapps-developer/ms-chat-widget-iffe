@@ -178,6 +178,46 @@ Tips for new widgets:
 2) Upload `dist/chat-widget.js` to your CDN or static host
 3) Embed the `<script src>` URL on your target site(s)
 
+
+---
+
+## Releases and versioning (CI‑powered)
+This repo includes a GitHub Actions workflow that automatically builds the widget and attaches the distributable file to a GitHub Release whenever you push a git tag that starts with `v` (e.g., `v0.1.0`).
+
+Why tags? Using version tags keeps a clear history of what was shipped and lets your team/CDN reference an immutable artifact.
+
+Recommended flow (for each release):
+1) Make changes and verify locally
+```bash
+npm install
+npm run build
+# optional: serve locally and test
+python3 -m http.server 8080
+# visit http://localhost:8080/examples/external-host.html
+```
+2) Create a version tag and push it
+```bash
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+3) What happens next
+- GitHub Actions runs automatically:
+  - installs deps, builds the project
+  - attaches `dist/chat-widget.js` to the GitHub Release for the tag
+- You can find the Release and the attached asset at: GitHub → Releases
+
+Tips for future releases:
+- Use Semantic Versioning (`vMAJOR.MINOR.PATCH`) and increment as appropriate
+- Consider Conventional Commits to auto‑generate changelogs later
+- If you need to re‑cut a tag:
+  - delete local and remote tags, then recreate
+  ```bash
+  git tag -d v0.1.0
+  git push origin :refs/tags/v0.1.0
+  git tag -a v0.1.0 -m "v0.1.0"
+  git push origin v0.1.0
+  ```
+
 ---
 
 ## Troubleshooting
