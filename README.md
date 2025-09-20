@@ -218,6 +218,15 @@ Tips for future releases:
   git push origin v0.1.0
   ```
 
+
+### Direct URLs to the built bundle (dist)
+- Local (development):
+  - http://localhost:8080/dist/chat-widget.js
+- GitHub Release asset (example for v0.1.0):
+  - https://github.com/caretapps-developer/ms-chat-widget-iffe/releases/download/v0.1.0/chat-widget.js
+- Pattern for future versions:
+  - https://github.com/caretapps-developer/ms-chat-widget-iffe/releases/download/vX.Y.Z/chat-widget.js
+
 ---
 
 ## Troubleshooting
