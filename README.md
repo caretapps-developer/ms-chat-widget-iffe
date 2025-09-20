@@ -226,6 +226,10 @@ Tips for future releases:
   - https://github.com/caretapps-developer/ms-chat-widget-iffe/releases/download/v0.1.0/chat-widget.js
 - Pattern for future versions:
   - https://github.com/caretapps-developer/ms-chat-widget-iffe/releases/download/vX.Y.Z/chat-widget.js
+- GitHub Pages (latest on main):
+  - https://caretapps-developer.github.io/ms-chat-widget-iffe/dist/chat-widget.js
+  - Example page: https://caretapps-developer.github.io/ms-chat-widget-iffe/examples/external-host.html
+
 
 ---
 
