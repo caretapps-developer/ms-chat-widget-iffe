@@ -23,19 +23,21 @@ export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen 
           style={{ backgroundColor: theme.bg || undefined }}
         >
           <div className="cw-header">
-            <span className="cw-title">Minimal Starter Chat Widget Local or Remote</span>
-            <button
-              onClick={() => (onRequestClose ? onRequestClose() : setOpen(false))}
-              className="cw-close"
-              aria-label="Close"
-            >
-              ✕
-            </button>
+            <span className="cw-title">Inline Chat Widget</span>
+            {onRequestClose && (
+              <button
+                onClick={onRequestClose}
+                className="cw-close"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           <div style={{ padding: 16 }}>
             <p style={{ margin: "8px 0 16px", color: "#4b5563" }}>
-              Use this as a base: a simple title, short description, one input, and a button.
+              This widget is embedded inline in the page. Perfect for embedding in specific sections!
             </p>
             <div className="cw-inputbar" style={{ borderTop: "none", padding: 0 }}>
               <input
@@ -57,15 +59,15 @@ export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen 
         </div>
       )}
 
-      {/* Optional FAB when not in overlay mode */}
-      {!inOverlay && (
+      {/* Toggle button for inline mode when not always open */}
+      {!inOverlay && !defaultOpen && (
         <button
           onClick={() => setOpen(o => !o)}
           className="cw-fab"
           style={theme.accent ? { backgroundColor: theme.accent } : undefined}
-          aria-label="Open widget"
+          aria-label={open ? "Close widget" : "Open widget"}
         >
-          ⚙️
+          {open ? "✕" : "💬"}
         </button>
       )}
     </>

@@ -81,12 +81,44 @@ This builds the widget and starts a local server. Then open http://localhost:808
 
 ---
 
-## Embedding on any website
-Paste the following on the host site (after you host `chat-widget.js` on your CDN or server):
+## Embedding on any website (Givebutter-style)
+
+### Method 1: Custom Elements (Recommended)
+```html
+<!-- Load the widget library -->
+<script src="https://cdn.example.com/chat-widget.js"></script>
+
+<!-- Embed inline widget directly -->
+<chat-widget id="user-12345" align="center" accent="#ff5722" bg="#fff8f0"></chat-widget>
+
+<!-- Or create a trigger button -->
+<chat-widget mode="trigger" id="user-67890" label="Chat with us" accent="#0b84ff"></chat-widget>
+```
+
+### Method 2: Data Attributes (Givebutter-compatible)
+```html
+<script src="https://cdn.example.com/chat-widget.js"></script>
+
+<!-- Givebutter-style data attributes -->
+<button data-gb-account="your-account" data-gb-campaign="user-12345" data-gb-align="center">
+  Donate Now
+</button>
+
+<!-- Custom data attributes -->
+<button data-cw-trigger data-cw-id="user-12345" data-cw-target="#widget-container" data-cw-align="right">
+  Open Chat
+</button>
+<div id="widget-container"></div>
+```
+
+### Method 3: JavaScript API
 ```html
 <script src="https://cdn.example.com/chat-widget.js"></script>
 <script>
-  ChatWidget.mount({
+  // Mount widget with full control
+  const widget = ChatWidget.mount({
+    target: "#my-container",
+    align: "center",
     id: "user-12345",
     theme: { accent: "#ff5722", bg: "#fff8f0" },
     onSendMessage: async (text, { id }) => {
@@ -96,9 +128,15 @@ Paste the following on the host site (after you host `chat-widget.js` on your CD
         body: JSON.stringify({ id, message: text })
       });
       const data = await res.json();
-      return data.reply; // Text to show as the bot response
+      return data.reply;
     }
   });
+
+  // Update widget dynamically (like Givebutter)
+  widget.update({ theme: { accent: "#4caf50" } });
+
+  // Close widget
+  widget.close();
 </script>
 ```
 
@@ -106,6 +144,65 @@ Options:
 - `id` – Any session/user identifier for your backend.
 - `theme` – `{ accent: string, bg: string }` for quick color customization.
 - `onSendMessage(text, { id })` – Async function that returns the bot’s response text.
+- `target` – CSS selector or DOM element where to mount the widget.
+- `align` – Widget alignment: `"left"`, `"center"`, or `"right"`.
+- `account` – Account identifier for multi-account support.
+
+---
+
+## Givebutter-style Features
+
+This implementation includes Givebutter-compatible features for professional widget embedding:
+
+### Widget Management API
+```javascript
+// Get all mounted widgets
+const widgets = ChatWidget.getAllWidgets();
+
+// Get specific widget by ID
+const widget = ChatWidget.getWidget('widget-123');
+
+// Close specific widget
+ChatWidget.closeWidget('widget-123');
+
+// Close all widgets
+ChatWidget.closeAllWidgets();
+```
+
+### Alignment Options (like Givebutter)
+```html
+<!-- Left aligned (default) -->
+<chat-widget id="user-1" align="left"></chat-widget>
+
+<!-- Center aligned -->
+<chat-widget id="user-2" align="center"></chat-widget>
+
+<!-- Right aligned -->
+<chat-widget id="user-3" align="right"></chat-widget>
+```
+
+### Dynamic Updates (like Givebutter)
+```javascript
+const widget = ChatWidget.mount({ id: "user-123" });
+
+// Update theme dynamically
+widget.update({
+  theme: { accent: "#4caf50", bg: "#e8f5e8" }
+});
+
+// Update any option
+widget.update({
+  id: "new-user-456",
+  theme: { accent: "#ff5722" }
+});
+```
+
+### Multiple Account Support
+```html
+<!-- Support multiple accounts on same site -->
+<button data-gb-account="account-1" data-gb-campaign="campaign-1">Account 1</button>
+<button data-gb-account="account-2" data-gb-campaign="campaign-2">Account 2</button>
+```
 
 ---
 

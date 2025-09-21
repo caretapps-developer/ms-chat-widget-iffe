@@ -28,63 +28,110 @@
   </head>
   <body>
     <div class="container">
-      <h1>🧪 Local Chat Widget Test</h1>
-      <p>Test the chat widget with different configurations:</p>
-      
-      <h3>Method 1: Data Attributes (Declarative)</h3>
-      <button 
+      <h1>🧪 Givebutter-Style Chat Widget Test</h1>
+      <p>Test the chat widget with Givebutter-style implementation:</p>
+
+      <h3>Method 1: Givebutter-Style Data Attributes</h3>
+      <button
         class="test-button"
-        data-cw-trigger
-        data-cw-id="test-user-123"
-        data-cw-accent="#0b84ff"
-        data-cw-bg="#ffffff"
+        data-gb-account="demo-account"
+        data-gb-campaign="test-campaign-123"
+        data-gb-target="#widget-container-1"
+        data-gb-align="center"
+        data-gb-accent="#0b84ff"
+        data-gb-bg="#ffffff"
       >
-        Open Blue Widget
+        Mount Blue Widget (Givebutter Style)
       </button>
-      
-      <button 
+      <div id="widget-container-1" style="margin: 16px 0; min-height: 50px; border: 2px dashed #ddd; border-radius: 8px; padding: 16px;">
+        <p style="color: #666; text-align: center; margin: 0;">Widget will appear here (centered)</p>
+      </div>
+
+      <h3>Method 2: Custom Data Attributes with Alignment</h3>
+      <button
         class="test-button"
         data-cw-trigger
         data-cw-id="test-user-456"
+        data-cw-align="right"
+        data-cw-target="#widget-container-2"
         data-cw-accent="#ff5722"
         data-cw-bg="#fff8f0"
         style="background: #ff5722;"
       >
-        Open Orange Widget
+        Mount Orange Widget (Right Aligned)
       </button>
-      
-      <h3>Method 2: JavaScript API (Programmatic)</h3>
-      <button class="test-button" onclick="openCustomWidget()" style="background: #9c27b0;">
-        Open Purple Widget (JS API)
+      <div id="widget-container-2" style="margin: 16px 0; min-height: 50px; border: 2px dashed #ddd; border-radius: 8px; padding: 16px;">
+        <p style="color: #666; text-align: center; margin: 0;">Widget will appear here (right aligned)</p>
+      </div>
+
+      <h3>Method 3: JavaScript API with Widget Management</h3>
+      <button class="test-button" onclick="createManagedWidget()" style="background: #9c27b0;">
+        Create Managed Widget
       </button>
-      
-      <h3>Method 3: With Custom Message Handler</h3>
-      <button class="test-button" onclick="openWidgetWithHandler()" style="background: #4caf50;">
-        Open Green Widget (With Handler)
+      <button class="test-button" onclick="updateWidget()" style="background: #673ab7;">
+        Update Widget Theme
       </button>
+      <button class="test-button" onclick="closeWidget()" style="background: #f44336;">
+        Close Widget
+      </button>
+      <div id="widget-container-3" style="margin: 16px 0; min-height: 50px; border: 2px dashed #ddd; border-radius: 8px; padding: 16px;">
+        <p style="color: #666; text-align: center; margin: 0;">Managed widget will appear here</p>
+      </div>
+
+      <h3>Method 4: Givebutter-Style Custom Element (Inline)</h3>
+      <p>Widget embedded directly using Givebutter-style custom element:</p>
+      <chat-widget mode="inline" id="custom-element-user" align="center" accent="#4caf50" bg="#e8f5e8"></chat-widget>
+
+      <h3>Method 5: Custom Element (Trigger Mode)</h3>
+      <chat-widget mode="trigger" id="trigger-user" accent="#ff9800" bg="#fff3e0" label="Click to Mount Widget" align="left"></chat-widget>
+
+      <h3>Method 6: Multiple Widgets with Different Alignments</h3>
+      <div style="margin: 16px 0;">
+        <p><strong>Left Aligned:</strong></p>
+        <chat-widget mode="inline" id="left-widget" align="left" accent="#2196f3" bg="#e3f2fd"></chat-widget>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <p><strong>Center Aligned:</strong></p>
+        <chat-widget mode="inline" id="center-widget" align="center" accent="#ff9800" bg="#fff3e0"></chat-widget>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <p><strong>Right Aligned:</strong></p>
+        <chat-widget mode="inline" id="right-widget" align="right" accent="#e91e63" bg="#fce4ec"></chat-widget>
+      </div>
+
+      <h3>Method 7: Widget Management Demo</h3>
+      <button class="test-button" onclick="showAllWidgets()" style="background: #607d8b;">
+        Show All Widgets Info
+      </button>
+      <button class="test-button" onclick="closeAllWidgets()" style="background: #795548;">
+        Close All Widgets
+      </button>
+      <div id="widget-info" style="margin: 16px 0; padding: 16px; background: #f5f5f5; border-radius: 8px; font-family: monospace; font-size: 14px;">
+        <p>Widget management info will appear here...</p>
+      </div>
     </div>
 
     <script>
-      // Test the JavaScript API
-      function openCustomWidget() {
+      // Global variable to store managed widget reference
+      let managedWidget = null;
+
+      // Test the Givebutter-style JavaScript API
+      function createManagedWidget() {
         if (window.ChatWidget) {
-          ChatWidget.mount({
-            id: "js-user-789",
-            theme: { 
-              accent: "#9c27b0", 
-              bg: "#f3e5f5" 
-            }
-          });
-        }
-      }
-      
-      function openWidgetWithHandler() {
-        if (window.ChatWidget) {
-          ChatWidget.mount({
-            id: "handler-user-999",
-            theme: { 
-              accent: "#4caf50", 
-              bg: "#e8f5e8" 
+          // Close existing widget if any
+          if (managedWidget) {
+            managedWidget.close();
+          }
+
+          managedWidget = ChatWidget.mount({
+            target: "#widget-container-3",
+            align: "center",
+            id: "managed-widget-789",
+            theme: {
+              accent: "#9c27b0",
+              bg: "#f3e5f5"
             },
             onSendMessage: async (text, { id }) => {
               console.log('Message sent:', text, 'from user:', id);
@@ -93,8 +140,73 @@
               return `Echo: "${text}" (from user ${id})`;
             }
           });
+
+          console.log('Created widget:', managedWidget);
         }
       }
+
+      function updateWidget() {
+        if (managedWidget) {
+          // Update widget theme (Givebutter-style dynamic updates)
+          managedWidget.update({
+            theme: {
+              accent: "#4caf50",
+              bg: "#e8f5e8"
+            }
+          });
+          console.log('Updated widget theme to green');
+        } else {
+          alert('No widget to update. Create one first!');
+        }
+      }
+
+      function closeWidget() {
+        if (managedWidget) {
+          managedWidget.close();
+          managedWidget = null;
+          console.log('Closed managed widget');
+        } else {
+          alert('No widget to close');
+        }
+      }
+
+      function showAllWidgets() {
+        if (window.ChatWidget) {
+          const allWidgets = ChatWidget.getAllWidgets();
+          const info = document.getElementById('widget-info');
+
+          if (allWidgets.length === 0) {
+            info.innerHTML = '<p>No widgets currently mounted</p>';
+          } else {
+            let html = `<p><strong>Found ${allWidgets.length} widget(s):</strong></p><ul>`;
+            allWidgets.forEach((widget, index) => {
+              html += `<li>Widget ${index + 1}: ID=${widget.options.id || 'N/A'}, Theme=${JSON.stringify(widget.options.theme || {})}</li>`;
+            });
+            html += '</ul>';
+            info.innerHTML = html;
+          }
+
+          console.log('All widgets:', allWidgets);
+        }
+      }
+
+      function closeAllWidgets() {
+        if (window.ChatWidget) {
+          ChatWidget.closeAllWidgets();
+          managedWidget = null;
+          document.getElementById('widget-info').innerHTML = '<p>All widgets closed</p>';
+          console.log('Closed all widgets');
+        }
+      }
+
+      // Demo auto-mounting on page load (like Givebutter)
+      window.addEventListener('load', function() {
+        console.log('ChatWidget API available:', !!window.ChatWidget);
+        console.log('ChatWidget version:', window.ChatWidget?.version);
+
+        // Show initial widget count
+        setTimeout(showAllWidgets, 1000);
+      });
     </script>
   </body>
 </html>
