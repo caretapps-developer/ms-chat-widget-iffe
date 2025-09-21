@@ -2,6 +2,20 @@
 
 This project is a minimal, production-friendly starter for building a floating chat widget in React that can be embedded on any website using a single `<script>` tag. The bundle is an IIFE (Immediately Invoked Function Expression) that includes React, so host sites don’t need to install React.
 
+## 🔗 Quick Reference URLs
+
+### Local Development (after running `npm run test:widget`)
+- **Comprehensive Test**: http://localhost:8080/test-local.html
+- **Simple Example**: http://localhost:8080/site/host_website/index.html
+- **Built Widget**: http://localhost:8080/dist/chat-widget.js
+
+### GitHub Pages (Production)
+- **Demo Page**: https://caretapps-developer.github.io/ms-chat-widget-iffe/
+- **Widget Bundle**: https://caretapps-developer.github.io/ms-chat-widget-iffe/dist/chat-widget.js
+
+### GitHub Repository
+- **Releases**: https://github.com/caretapps-developer/ms-chat-widget-iffe/releases
+
 ---
 
 ## What you’ll learn
