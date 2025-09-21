@@ -24,46 +24,42 @@ export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen 
     <>
       {open && (
         <div
-          className="flex h-full w-full flex-col rounded-lg border bg-card text-card-foreground shadow-xl"
+          className="cw-root"
           style={{ backgroundColor: theme.bg || undefined }}
         >
-          <div className="flex items-center gap-2 border-b px-4 py-3">
-            <span className="font-medium text-gray-900">Chat</span>
+          <div className="cw-header">
+            <span className="cw-title">Chat</span>
             <button
               onClick={() => (onRequestClose ? onRequestClose() : setOpen(false))}
-              className="ml-auto rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="cw-close"
               aria-label="Close"
             >
               ✕
             </button>
           </div>
-          <div className="flex-1 space-y-2 overflow-y-auto p-3">
+          <div className="cw-messages">
             {messages.map(m => (
-              <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div key={m.id} className={`cw-row ${m.role === "user" ? "right" : "left"}`}>
                 <span
-                  className={`inline-block rounded-lg px-3 py-2 text-sm ${
-                    m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                  }`}
-                  style={m.role === "user"
-                    ? { backgroundColor: theme.accent || "#0b84ff" }
-                    : undefined}
+                  className={`cw-bubble ${m.role === "user" ? "user" : "bot"}`}
+                  style={m.role === "user" && theme.accent ? { backgroundColor: theme.accent, color: "#fff" } : undefined}
                 >
                   {m.text}
                 </span>
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 border-t p-2">
+          <div className="cw-inputbar">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") send(); }}
               placeholder="Type..."
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+              className="cw-input"
             />
             <button
               onClick={send}
-              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className="cw-send"
               style={theme.accent ? { backgroundColor: theme.accent } : undefined}
             >
               Send
@@ -76,7 +72,7 @@ export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen 
       {!inOverlay && (
         <button
           onClick={() => setOpen(o => !o)}
-          className="fixed bottom-5 right-5 z-[2147483000] inline-flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white shadow-xl"
+          className="cw-fab"
           style={theme.accent ? { backgroundColor: theme.accent } : undefined}
           aria-label="Open chat"
         >

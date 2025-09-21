@@ -1,8 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import ChatWidget from "./ChatWidget";
-import cssText from "./generated.css";
-import shadcnCssText from "./shadcn.css";
+import widgetCssText from "./widget.css";
 
 // Create an overlay iframe and mount the widget inside for strong isolation
 function openOverlay(options = {}) {
@@ -91,15 +90,10 @@ function openOverlay(options = {}) {
 
     // Inject compiled CSS if present
     try {
-      if (typeof cssText === "string" && cssText.length > 0) {
+      if (typeof widgetCssText === "string" && widgetCssText.length > 0) {
         const style = doc.createElement("style");
-        style.textContent = cssText;
+        style.textContent = widgetCssText;
         doc.head.appendChild(style);
-      }
-      if (typeof shadcnCssText === "string" && shadcnCssText.length > 0) {
-        const style2 = doc.createElement("style");
-        style2.textContent = shadcnCssText;
-        doc.head.appendChild(style2);
       }
     } catch {}
 
