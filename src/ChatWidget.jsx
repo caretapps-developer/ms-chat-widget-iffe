@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 // Minimal starter widget: title, description, single input and a button
-export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen = false, inOverlay = false, onRequestClose }) {
+export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen = false, inOverlay = false}) {
   const [open, setOpen] = useState(defaultOpen);
   const [input, setInput] = useState("");
 
@@ -24,13 +24,6 @@ export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen 
         >
           <div className="cw-header">
             <span className="cw-title">Minimal Starter Chat Widget Local or Remote</span>
-            <button
-              onClick={() => (onRequestClose ? onRequestClose() : setOpen(false))}
-              className="cw-close"
-              aria-label="Close"
-            >
-              ✕
-            </button>
           </div>
 
           <div style={{ padding: 16 }}>
