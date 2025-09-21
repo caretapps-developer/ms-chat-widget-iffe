@@ -39,7 +39,7 @@ Why IIFE?
 ```
 
 Key files to skim:
-- `src/ChatWidget.jsx` – UI, behavior, and basic theming
+- `src/ChatWidget.jsx` – Minimal UI (title, short description, one input, and a button), basic theming
 - `src/index.js` – Creates/attaches `window.ChatWidget.mount()`
 - `esbuild.config.js` – esbuild entry and output settings
 
@@ -70,10 +70,10 @@ python3 -m http.server 8080
 ```
 - Open the example page:
 ```
-http://localhost:8080/examples/external-host.html
+http://localhost:8080/host_website/index.html
 ```
 
-You should see a chat FAB in the bottom‑right; click to open the panel and send a message.
+You should see a button on the page; click it to open the centered overlay widget.
 
 ---
 
@@ -107,11 +107,10 @@ Options:
 
 ## How the code works (high level)
 - `src/index.js` attaches a `mount` function to `window.ChatWidget`. When called, it ensures an element exists (or creates one) and renders the React component into it using `createRoot`.
-- `src/ChatWidget.jsx` renders:
-  - A floating action button (FAB)
-  - A chat panel when open
-  - Simple message list and input
-  - Calls `onSendMessage` and appends the response as a "bot" message
+- `src/ChatWidget.jsx` renders a minimal widget:
+  - A title and short description
+  - A single text input and a Submit button
+  - (Optional) calls `onSendMessage(text, { id })` for host-defined handling
 
 Implementation detail: We rely on our own `window.ChatWidget = { mount }` assignment in `src/index.js`. The esbuild config intentionally doesn’t set `globalName` to avoid overriding this object in the generated IIFE.
 
@@ -168,7 +167,7 @@ Tips for new widgets:
 
 ## Testing locally and linting
 - Build: `npm run build`
-- Open example: `examples/external-host.html` via a static server (see above)
+- Open example: `host_website/index.html` via a static server (see above)
 - Lint: `npm run lint`
 
 ---
@@ -193,7 +192,7 @@ npm install
 npm run build
 # optional: serve locally and test
 python3 -m http.server 8080
-# visit http://localhost:8080/examples/external-host.html
+# visit http://localhost:8080/host_website/index.html
 ```
 2) Create a version tag and push it
 ```bash
@@ -229,8 +228,7 @@ Why use both?
 
 What is published to Pages
 - `dist/chat-widget.js` (the embeddable bundle)
-- `examples/external-host.html` (demo page)
-- `index.html` (root demo)
+- `host_website/index.html` (demo page)
 
 When it runs
 - On push to `main`
@@ -243,7 +241,7 @@ Public URLs
 - See “Direct URLs to the built bundle (dist)” below for Pages links
 
 Recommended development flow
-1) Develop locally: `npm run build`, test `examples/external-host.html`
+1) Develop locally: `npm run build`, test `host_website/index.html`
 2) Push to `main`: Pages publishes the latest bundle & demo for easy sharing
 3) Ready to ship: tag a version (e.g., `v0.2.0`) → Release workflow builds and attaches `dist/chat-widget.js` to the GitHub Release (immutable URL)
 4) Optional: upload the release artifact to your CDN for production serving
@@ -261,7 +259,7 @@ Notes
   - https://github.com/caretapps-developer/ms-chat-widget-iffe/releases/download/vX.Y.Z/chat-widget.js
 - GitHub Pages (latest on main):
   - https://caretapps-developer.github.io/ms-chat-widget-iffe/dist/chat-widget.js
-  - Example page: https://caretapps-developer.github.io/ms-chat-widget-iffe/examples/external-host.html
+  - Example page: https://caretapps-developer.github.io/ms-chat-widget-iffe/host_website/index.html
 
 
 ---
