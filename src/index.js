@@ -15,6 +15,10 @@ function openOverlay(options = {}) {
     host.style.zIndex = "2147483000";
     host.style.pointerEvents = "auto"; // allow backdrop clicks to close
     document.body.appendChild(host);
+    if (!host.hasAttribute("data-prev-overflow")) {
+      host.setAttribute("data-prev-overflow", document.body.style.overflow || "");
+    }
+    document.body.style.overflow = "hidden";
   }
 
   // Ensure a semitransparent backdrop exists (click to close)
@@ -34,10 +38,13 @@ function openOverlay(options = {}) {
   // Create a container anchored bottom-right for the iframe
   const container = document.createElement("div");
   container.style.position = "absolute";
-  container.style.right = "16px";
-  container.style.bottom = "16px";
-  container.style.width = "360px";
-  container.style.height = "480px";
+  container.style.top = "50%";
+  container.style.left = "50%";
+  container.style.transform = "translate(-50%, -50%)";
+  container.style.width = "min(420px, 90vw)";
+  container.style.height = "min(360px, 80vh)";
+  container.style.maxWidth = "90vw";
+  container.style.maxHeight = "90vh";
   container.style.pointerEvents = "auto";
   container.style.zIndex = "1";
   container.setAttribute("data-cw-container", "1");
@@ -60,6 +67,8 @@ function openOverlay(options = {}) {
     // If no containers remain, remove the host (and its backdrop)
     const remaining = host.querySelectorAll('[data-cw-container]').length;
     if (host && remaining === 0) {
+      const prev = host.getAttribute("data-prev-overflow");
+      if (prev !== null) document.body.style.overflow = prev;
       try { host.remove(); } catch {}
     }
     document.removeEventListener("keydown", onKey);

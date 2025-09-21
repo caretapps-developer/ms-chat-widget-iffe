@@ -38,8 +38,32 @@ jobs:
           rm -rf site
           mkdir -p site
           cp -R dist site/dist
-          cp -R host_website site/host_website
-          cp site/host_website/index.html site/index.html
+          cat > site/index.html << 'EOF'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Chat Widget Demo</title>
+              <script src="./dist/chat-widget.js" defer></script>
+              <style>
+                body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; }
+                .container { max-width: 720px; margin: 0 auto; }
+                .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(2,6,23,0.08); }
+                button { padding:8px 12px; border:0; border-radius:8px; background:#0b84ff; color:#fff; cursor:pointer; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h1>Chat Widget Demo</h1>
+                <p>This minimal page loads the bundle and opens the widget via the button.</p>
+                <div class="card">
+                  <p><button data-cw-trigger data-cw-id="ext-user-42" data-cw-accent="#0b84ff" data-cw-bg="#ffffff">Open widget</button></p>
+                </div>
+              </div>
+            </body>
+          </html>
+          EOF
 
 
       - name: Upload Pages artifact

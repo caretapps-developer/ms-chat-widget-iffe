@@ -18,22 +18,19 @@
       <p>This page simulates a third-party site embedding the chat widget via a single script tag.</p>
       <div class="card">
         <h2>Product Page</h2>
-        <p>Here is some normal page content. The chat button should appear in the bottom-right corner.</p>
+        <p>Here is some normal page content. Click the button below to open the centered overlay widget.</p>
       </div>
     </div>
 
     <!-- Declarative trigger (data attributes) -->
     <p>
-      <a href="#"
+      <button
          data-cw-trigger
          data-cw-id="ext-user-42"
          data-cw-accent="#0b84ff"
-         data-cw-bg="#ffffff">Open chat</a>
-    </p>
-
-    <!-- Or custom element variant (auto-replaced with a trigger) -->
-    <p>
-      <chat-widget id="ext-user-42" accent="#0b84ff" bg="#ffffff" label="Need help?"></chat-widget>
+         data-cw-bg="#ffffff"
+         style="padding:8px 12px; border:0; border-radius:8px; background:#0b84ff; color:#fff; cursor:pointer;"
+      >Open widget</button>
     </p>
   </body>
 </html>
