@@ -3,165 +3,337 @@ import { createRoot } from "react-dom/client";
 import ChatWidget from "./ChatWidget";
 import widgetCssText from "./widget.css";
 
-// Create an overlay iframe and mount the widget inside for strong isolation
-function openOverlay(options = {}) {
-  // Reuse if already open
-  let host = document.getElementById("cw-overlay-host");
-  if (!host) {
-    host = document.createElement("div");
-    host.id = "cw-overlay-host";
-    host.style.position = "fixed";
-    host.style.inset = "0"; // full-screen overlay host
-    host.style.zIndex = "2147483000";
-    host.style.pointerEvents = "auto"; // allow backdrop clicks to close
-    document.body.appendChild(host);
-    if (!host.hasAttribute("data-prev-overflow")) {
-      host.setAttribute("data-prev-overflow", document.body.style.overflow || "");
+// Global widget registry to track all mounted widgets
+const widgetRegistry = new Map();
+let widgetCounter = 0;
+
+// Create an iframe-based widget (like Givebutter)
+function mountInline(options = {}) {
+  const { target, align = 'left', account, ...widgetOptions } = options;
+
+  // Find target element - can be selector string or DOM element
+  let targetEl;
+  if (typeof target === 'string') {
+    targetEl = document.querySelector(target);
+  } else if (target instanceof Element) {
+    targetEl = target;
+  } else {
+    // Default: create a new div and append to body
+    targetEl = document.createElement('div');
+    targetEl.id = `cw-inline-widget-${++widgetCounter}`;
+    document.body.appendChild(targetEl);
     }
-    document.body.style.overflow = "hidden";
+
+  if (!targetEl) {
+    console.warn('ChatWidget: Target element not found');
+    return null;
   }
 
-  // Ensure a semitransparent backdrop exists (click to close)
-  let backdrop = host.querySelector('#cw-overlay-backdrop');
-  if (!backdrop) {
-    backdrop = document.createElement('div');
-    backdrop.id = 'cw-overlay-backdrop';
-    backdrop.style.position = 'absolute';
-    backdrop.style.inset = '0';
-    backdrop.style.background = 'rgba(0,0,0,0.5)';
-    backdrop.style.pointerEvents = 'auto';
-    backdrop.style.zIndex = '0';
-    host.appendChild(backdrop);
+  // Check if widget is already mounted in this target
+  if (targetEl.hasAttribute('data-cw-mounted')) {
+    console.warn('ChatWidget: Widget already mounted in this element');
+    return null;
   }
 
-
-  // Create a container anchored bottom-right for the iframe
+  // Create container for the iframe (Givebutter-style)
   const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.top = "50%";
-  container.style.left = "50%";
-  container.style.transform = "translate(-50%, -50%)";
-  container.style.width = "min(420px, 90vw)";
-  container.style.height = "min(360px, 80vh)";
-  container.style.maxWidth = "90vw";
-  container.style.maxHeight = "90vh";
-  container.style.pointerEvents = "auto";
-  container.style.zIndex = "1";
+  container.style.width = "100%";
+  container.style.maxWidth = "420px"; // Givebutter's max width
+  container.style.minHeight = "200px";
+  container.style.border = "1px solid #e5e7eb";
+  container.style.borderRadius = "12px";
+  container.style.boxShadow = "0 4px 12px rgba(2,6,23,0.08)";
+  container.style.backgroundColor = "#ffffff";
+  container.style.overflow = "hidden";
+  container.style.margin = "0";
   container.setAttribute("data-cw-container", "1");
 
+  // Apply alignment (Givebutter feature)
+  if (align === 'center') {
+    container.style.margin = "0 auto";
+  } else if (align === 'right') {
+    container.style.marginLeft = "auto";
+  }
+
+  // Create iframe for isolation (like Givebutter)
   const iframe = document.createElement("iframe");
-  iframe.title = "Chat";
   iframe.style.width = "100%";
-  iframe.style.height = "100%";
+  iframe.style.height = "400px";
   iframe.style.border = "none";
   iframe.style.borderRadius = "12px";
-  iframe.style.boxShadow = "0 12px 30px rgba(2,6,23,0.18)";
-  iframe.referrerPolicy = "no-referrer";
-  iframe.setAttribute("aria-label", "Chat widget");
+  iframe.style.backgroundColor = "#ffffff";
+  iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms");
+  iframe.setAttribute("data-cw-iframe", "1");
 
   container.appendChild(iframe);
-  host.appendChild(container);
+  targetEl.appendChild(container);
+  targetEl.setAttribute('data-cw-mounted', 'true');
 
-  function closeOverlay() {
-    try { host.removeChild(container); } catch {}
-    // If no containers remain, remove the host (and its backdrop)
-    const remaining = host.querySelectorAll('[data-cw-container]').length;
-    if (host && remaining === 0) {
-      const prev = host.getAttribute("data-prev-overflow");
-      if (prev !== null) document.body.style.overflow = prev;
-      try { host.remove(); } catch {}
-    }
-    document.removeEventListener("keydown", onKey);
-  }
+  // Generate unique widget ID
+  const widgetId = `widget-${++widgetCounter}`;
 
-  function onKey(e) {
-    if (e.key === "Escape") closeOverlay();
-  }
-  document.addEventListener("keydown", onKey);
-  if (backdrop) {
-    backdrop.onclick = (e) => { e.preventDefault(); closeOverlay(); };
-  }
-
-  // Render React into the iframe once it's ready
-  const onLoad = () => {
-    const doc = iframe.contentDocument;
-    if (!doc) return;
-
-    // Basic doc structure
-    if (!doc.head) {
-      const head = doc.createElement("head");
-      doc.documentElement.insertBefore(head, doc.body || null);
-    }
-    if (!doc.body) {
-      const body = doc.createElement("body");
-      doc.documentElement.appendChild(body);
-    }
-
-    // Inject compiled CSS if present
+  function closeWidget() {
     try {
-      if (typeof widgetCssText === "string" && widgetCssText.length > 0) {
-        const style = doc.createElement("style");
-        style.textContent = widgetCssText;
-        doc.head.appendChild(style);
-      }
+      targetEl.removeChild(container);
+      targetEl.removeAttribute('data-cw-mounted');
+      widgetRegistry.delete(widgetId);
     } catch {}
+  }
 
-    const mountEl = doc.createElement("div");
-    doc.body.appendChild(mountEl);
+  // Create iframe content with React widget
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-    const root = createRoot(mountEl);
-    root.render(<ChatWidget {...options} defaultOpen={true} inOverlay={true} onRequestClose={closeOverlay} />);
+  // Write HTML structure to iframe
+  iframeDoc.open();
+  iframeDoc.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #ffffff;
+        }
+        ${widgetCssText || ''}
+      </style>
+    </head>
+    <body>
+      <div id="widget-root"></div>
+      <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+      <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    </body>
+    </html>
+  `);
+  iframeDoc.close();
 
-    // Return unmount function
-    return () => {
-      try { root.unmount(); } catch {}
-      closeOverlay();
+  // Wait for iframe to load, then render React component
+  iframe.onload = () => {
+    try {
+      const iframeWindow = iframe.contentWindow;
+      const iframeDocument = iframe.contentDocument;
+      const mountPoint = iframeDocument.getElementById('widget-root');
+
+      if (iframeWindow.React && iframeWindow.ReactDOM && mountPoint) {
+        // Create React element in iframe context
+        const ChatWidgetElement = iframeWindow.React.createElement(
+          'div',
+          {
+            style: {
+              padding: '20px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              backgroundColor: widgetOptions.theme?.bg || '#ffffff',
+              color: '#333',
+              height: '100%',
+              minHeight: '360px'
+            }
+          },
+          iframeWindow.React.createElement('h3', {
+            style: {
+              margin: '0 0 16px 0',
+              color: widgetOptions.theme?.accent || '#0b84ff',
+              fontSize: '18px'
+            }
+          }, 'Chat Widget'),
+          iframeWindow.React.createElement('p', {
+            style: { margin: '0 0 16px 0', fontSize: '14px', color: '#666' }
+          }, `Hello! Widget ID: ${widgetOptions.id || 'guest'}`),
+          iframeWindow.React.createElement('div', {
+            style: {
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '12px',
+              marginBottom: '12px',
+              backgroundColor: '#f9fafb'
+            }
+          }, 'This is an iframe-isolated widget (like Givebutter)')
+        );
+
+        // Render using ReactDOM in iframe
+        const root = iframeWindow.ReactDOM.createRoot(mountPoint);
+        root.render(ChatWidgetElement);
+
+        // Store root for updates
+        widgetRegistry.set(widgetId, {
+          container,
+          targetEl,
+          iframe,
+          root,
+          closeWidget,
+          options: { target, align, account, ...widgetOptions }
+        });
+      }
+    } catch (error) {
+      console.error('ChatWidget: Failed to render in iframe:', error);
+    }
     };
-  };
 
-  if (iframe.contentDocument?.readyState === "complete") {
-    onLoad();
-  } else {
-    iframe.addEventListener("load", onLoad, { once: true });
-    // Force about:blank load to fire on some browsers
-    iframe.src = "about:blank";
+  // Return widget control object (like Givebutter)
+  return {
+    id: widgetId,
+    close: closeWidget,
+    update: (newOptions) => {
+      const widget = widgetRegistry.get(widgetId);
+      if (widget && widget.root) {
+        const updatedOptions = { ...widgetOptions, ...newOptions };
+        const iframeWindow = iframe.contentWindow;
+
+        const ChatWidgetElement = iframeWindow.React.createElement(
+          'div',
+          {
+            style: {
+              padding: '20px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              backgroundColor: updatedOptions.theme?.bg || '#ffffff',
+              color: '#333',
+              height: '100%',
+              minHeight: '360px'
+            }
+          },
+          iframeWindow.React.createElement('h3', {
+            style: {
+              margin: '0 0 16px 0',
+              color: updatedOptions.theme?.accent || '#0b84ff',
+              fontSize: '18px'
+            }
+          }, 'Chat Widget'),
+          iframeWindow.React.createElement('p', {
+            style: { margin: '0 0 16px 0', fontSize: '14px', color: '#666' }
+          }, `Hello! Widget ID: ${updatedOptions.id || 'guest'}`),
+          iframeWindow.React.createElement('div', {
+            style: {
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '12px',
+              marginBottom: '12px',
+              backgroundColor: '#f9fafb'
+            }
+          }, 'This is an iframe-isolated widget (like Givebutter)')
+        );
+
+        widget.root.render(ChatWidgetElement);
+        widget.options = { target, align, account, ...updatedOptions };
   }
 }
+  };
+}
 
-// Data-attribute triggers: <a data-cw-trigger data-cw-id="..." data-cw-accent="#..." data-cw-bg="#...">
+// Data-attribute triggers (Givebutter-style):
+// <button data-cw-trigger data-cw-target="#container" data-cw-align="center" data-cw-id="..." data-cw-accent="#..." data-cw-bg="#...">
+// <button data-cw-account="ACCOUNT_ID" data-cw-campaign="CAMPAIGN_ID">
 function setupDataAttributeTriggers() {
   document.addEventListener("click", (e) => {
-    const el = e.target && (e.target.closest ? e.target.closest("[data-cw-trigger]") : null);
-    if (!el) return;
+    // Check for Givebutter-style data attributes first
+    const gbEl = e.target && (e.target.closest ? e.target.closest("[data-gb-account][data-gb-campaign]") : null);
+    if (gbEl) {
     e.preventDefault();
-    const id = el.getAttribute("data-cw-id") || undefined;
-    const accent = el.getAttribute("data-cw-accent") || undefined;
-    const bg = el.getAttribute("data-cw-bg") || undefined;
-    openOverlay({ id, theme: { accent, bg } });
+      const account = gbEl.getAttribute("data-gb-account");
+      const campaign = gbEl.getAttribute("data-gb-campaign");
+      const target = gbEl.getAttribute("data-gb-target") || undefined;
+      const align = gbEl.getAttribute("data-gb-align") || 'left';
+
+      mountInline({
+        target,
+        align,
+        account,
+        id: campaign,
+        theme: {
+          accent: gbEl.getAttribute("data-gb-accent") || undefined,
+          bg: gbEl.getAttribute("data-gb-bg") || undefined
+        }
+  });
+      return;
+    }
+
+    // Check for our custom data attributes
+    const cwEl = e.target && (e.target.closest ? e.target.closest("[data-cw-trigger]") : null);
+    if (!cwEl) return;
+    e.preventDefault();
+
+    const id = cwEl.getAttribute("data-cw-id") || undefined;
+    const accent = cwEl.getAttribute("data-cw-accent") || undefined;
+    const bg = cwEl.getAttribute("data-cw-bg") || undefined;
+    const target = cwEl.getAttribute("data-cw-target") || undefined;
+    const align = cwEl.getAttribute("data-cw-align") || 'left';
+    const account = cwEl.getAttribute("data-cw-account") || undefined;
+
+    mountInline({ target, align, account, id, theme: { accent, bg } });
   });
 }
 
-// Custom element <chat-widget id="..." accent="#..." bg="#..." label="Chat with us">
+// Custom element (Givebutter-style): <chat-widget id="WIDGET_ID" align="center" account="ACCOUNT_ID">
 function setupCustomElement() {
   if (customElements.get("chat-widget")) return;
   class ChatWidgetElement extends HTMLElement {
     connectedCallback() {
-      const id = this.getAttribute("id") || undefined;
+      // Get Givebutter-style attributes
+      const widgetId = this.getAttribute("id");
+      const account = this.getAttribute("account") || undefined;
+      const align = this.getAttribute("align") || 'left';
       const accent = this.getAttribute("accent") || undefined;
       const bg = this.getAttribute("bg") || undefined;
+      const mode = this.getAttribute("mode") || "inline";
       const label = this.getAttribute("label") || "Chat";
 
-      // Replace the custom element with a clickable trigger preserving position
-      const a = document.createElement("a");
-      a.href = "#";
-      a.textContent = label;
-      a.setAttribute("data-cw-trigger", "");
-      if (id) a.setAttribute("data-cw-id", id);
-      if (accent) a.setAttribute("data-cw-accent", accent);
-      if (bg) a.setAttribute("data-cw-bg", bg);
-      this.replaceWith(a);
+      if (!widgetId) {
+        console.warn('ChatWidget: Widget ID is required');
+        return;
+      }
+
+      if (mode === "inline") {
+        // Mount widget directly in this element (like Givebutter)
+        const widget = mountInline({
+          target: this,
+          align,
+          account,
+          id: widgetId,
+          theme: { accent, bg }
+        });
+
+        // Store widget reference for potential future use
+        if (widget) {
+          this._chatWidget = widget;
+        }
+      } else {
+        // Replace with a clickable trigger
+        const button = document.createElement("button");
+        button.textContent = label;
+        button.style.padding = "8px 16px";
+        button.style.border = "1px solid #ccc";
+        button.style.borderRadius = "6px";
+        button.style.backgroundColor = accent || "#f0f0f0";
+        button.style.color = "#333";
+        button.style.cursor = "pointer";
+
+        button.setAttribute("data-cw-trigger", "");
+        if (widgetId) button.setAttribute("data-cw-id", widgetId);
+        if (accent) button.setAttribute("data-cw-accent", accent);
+        if (bg) button.setAttribute("data-cw-bg", bg);
+        if (account) button.setAttribute("data-cw-account", account);
+        if (align) button.setAttribute("data-cw-align", align);
+
+        this.replaceWith(button);
+      }
     }
+
+    // Givebutter-style API methods
+    close() {
+      if (this._chatWidget) {
+        this._chatWidget.close();
+      }
+    }
+
+    update(options) {
+      if (this._chatWidget) {
+        this._chatWidget.update(options);
+      }
   }
+  }
+
   customElements.define("chat-widget", ChatWidgetElement);
 }
 
@@ -170,12 +342,51 @@ function autoInit() {
   setupCustomElement();
 }
 
-// Public API mirrors old mount name but opens overlay
+// Public API (Givebutter-style)
 function mount(options = {}) {
-  openOverlay(options);
+  return mountInline(options);
 }
 
+// Givebutter-style widget management
+function getWidget(widgetId) {
+  return widgetRegistry.get(widgetId) || null;
+}
+
+function getAllWidgets() {
+  return Array.from(widgetRegistry.values());
+}
+
+function closeWidget(widgetId) {
+  const widget = widgetRegistry.get(widgetId);
+  if (widget) {
+    widget.closeWidget();
+    return true;
+  }
+  return false;
+}
+
+function closeAllWidgets() {
+  widgetRegistry.forEach(widget => widget.closeWidget());
+  widgetRegistry.clear();
+}
+
+// Legacy overlay function (if you want to keep overlay option)
+function mountOverlay(options = {}) {
+  console.warn('ChatWidget: Overlay mode not implemented in inline version');
+  return mount(options);
+}
 
 autoInit();
 
-window.ChatWidget = { mount };
+// Givebutter-style global API
+window.ChatWidget = {
+  mount,
+  mountInline,
+  mountOverlay,
+  getWidget,
+  getAllWidgets,
+  closeWidget,
+  closeAllWidgets,
+  // Givebutter compatibility
+  version: "1.0.0"
+};

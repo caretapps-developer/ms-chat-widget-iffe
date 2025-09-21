@@ -15,23 +15,43 @@
   <body>
     <div class="container">
       <h1>External Website</h1>
-      <p>This page simulates a third-party site embedding the chat widget via a single script tag.</p>
+      <p>This page simulates a third-party site embedding the chat widget inline (like Givebutter) via a single script tag.</p>
       <div class="card">
         <h2>Product Page</h2>
-        <p>Here is some normal page content. Click the button below to open the centered overlay widget.</p>
+        <p>Here is some normal page content. Below you can see the chat widget embedded inline (like Givebutter).</p>
+      </div>
+
+      <!-- Inline Widget Display (No Button Required) -->
+      <div style="margin: 32px 0;">
+        <h3>Chat Widget (Inline)</h3>
+        <p>This widget is embedded directly in the page content:</p>
+
+        <!-- Method 1: Custom Element (Inline Mode) -->
+        <chat-widget
+          mode="inline"
+          id="ext-user-42"
+          align="center"
+          accent="#0b84ff"
+          bg="#ffffff">
+        </chat-widget>
+      </div>
+
+      <!-- Optional: Button Trigger for Additional Widget -->
+      <div style="margin: 32px 0;">
+        <h3>Additional Widget (Button Trigger)</h3>
+        <p>Click the button below to add another widget:</p>
+        <button
+           data-cw-trigger
+           data-cw-id="ext-user-43"
+           data-cw-target="#additional-widget-container"
+           data-cw-align="left"
+           data-cw-accent="#ff5722"
+           data-cw-bg="#fff8f0"
+           style="padding:8px 12px; border:0; border-radius:8px; background:#ff5722; color:#fff; cursor:pointer;"
+        >Add Another Widget</button>
+        <div id="additional-widget-container" style="margin-top: 16px;"></div>
       </div>
     </div>
-
-    <!-- Declarative trigger (data attributes) -->
-    <p>
-      <button
-         data-cw-trigger
-         data-cw-id="ext-user-42"
-         data-cw-accent="#0b84ff"
-         data-cw-bg="#ffffff"
-         style="padding:8px 12px; border:0; border-radius:8px; background:#0b84ff; color:#fff; cursor:pointer;"
-      >Open widget</button>
-    </p>
   </body>
 </html>
 
