@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-export default function ChatWidget({ id, theme = {}, onSendMessage }) {
-  const [open, setOpen] = useState(false);
+export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen = false, inOverlay = false, onRequestClose }) {
+  const [open, setOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState([
     { id: 1, role: "bot", text: `Hello! Session id: ${id || "N/A"}` }
   ]);
@@ -23,56 +23,66 @@ export default function ChatWidget({ id, theme = {}, onSendMessage }) {
   return (
     <>
       {open && (
-        <div style={{
-          position: "fixed", right: 20, bottom: 80,
-          width: 360, height: 480,
-          background: theme.bg || "#fff",
-          border: "1px solid #ddd", borderRadius: 12,
-          boxShadow: "0 12px 30px rgba(2,6,23,0.18)",
-          zIndex: 2147483000,
-          display: "flex", flexDirection: "column"
-        }}>
-          <div style={{ padding: 12, borderBottom: "1px solid #eee" }}>
-            Chat
-            <button onClick={() => setOpen(false)} style={{ float: "right" }}>✕</button>
+        <div
+          className="flex h-full w-full flex-col rounded-lg border bg-card text-card-foreground shadow-xl"
+          style={{ backgroundColor: theme.bg || undefined }}
+        >
+          <div className="flex items-center gap-2 border-b px-4 py-3">
+            <span className="font-medium text-gray-900">Chat</span>
+            <button
+              onClick={() => (onRequestClose ? onRequestClose() : setOpen(false))}
+              className="ml-auto rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label="Close"
+            >
+              ✕
+            </button>
           </div>
-          <div style={{ flex: 1, padding: 12, overflowY: "auto" }}>
+          <div className="flex-1 space-y-2 overflow-y-auto p-3">
             {messages.map(m => (
-              <div key={m.id} style={{ margin: "6px 0", textAlign: m.role === "user" ? "right" : "left" }}>
-                <span style={{
-                  display: "inline-block", padding: "8px 12px", borderRadius: 8,
-                  background: m.role === "user" ? (theme.accent || "#0b84ff") : "#eee",
-                  color: m.role === "user" ? "#fff" : "#000"
-                }}>{m.text}</span>
+              <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <span
+                  className={`inline-block rounded-lg px-3 py-2 text-sm ${
+                    m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                  }`}
+                  style={m.role === "user"
+                    ? { backgroundColor: theme.accent || "#0b84ff" }
+                    : undefined}
+                >
+                  {m.text}
+                </span>
               </div>
             ))}
           </div>
-          <div style={{ padding: 8, borderTop: "1px solid #eee", display: "flex" }}>
+          <div className="flex items-center gap-2 border-t p-2">
             <input
-              value={input} onChange={e => setInput(e.target.value)}
+              value={input}
+              onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") send(); }}
               placeholder="Type..."
-              style={{ flex: 1, padding: "8px", borderRadius: 8, border: "1px solid #ccc" }}
+              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
             />
-            <button onClick={send} style={{
-              marginLeft: 8, padding: "8px 12px", borderRadius: 8,
-              border: "none", background: theme.accent || "#0b84ff", color: "#fff"
-            }}>Send</button>
+            <button
+              onClick={send}
+              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              style={theme.accent ? { backgroundColor: theme.accent } : undefined}
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
 
-      {/* FAB */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{
-          position: "fixed", right: 20, bottom: 20,
-          width: 56, height: 56, borderRadius: "50%",
-          border: "none", background: theme.accent || "#0b84ff",
-          color: "#fff", fontSize: 24, cursor: "pointer",
-          zIndex: 2147483000, boxShadow: "0 12px 30px rgba(2,6,23,0.18)"
-        }}
-      >💬</button>
+      {/* FAB (hidden inside overlay mode) */}
+      {!inOverlay && (
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="fixed bottom-5 right-5 z-[2147483000] inline-flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white shadow-xl"
+          style={theme.accent ? { backgroundColor: theme.accent } : undefined}
+          aria-label="Open chat"
+        >
+          💬
+        </button>
+      )}
     </>
   );
 }

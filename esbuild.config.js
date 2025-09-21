@@ -7,5 +7,5 @@ esbuild.build({
   format: "iife",
   minify: true,
   define: { "process.env.NODE_ENV": '"production"' },
-  loader: { ".js": "jsx", ".jsx": "jsx" },
+  loader: { ".js": "jsx", ".jsx": "jsx", ".css": "text" },
 }).catch(() => process.exit(1));

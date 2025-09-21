@@ -9,6 +9,8 @@
       .container { max-width: 720px; margin: 0 auto; }
       .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(2,6,23,0.08); }
     </style>
+    <!-- Library script (defer so it runs after HTML is parsed) -->
+    <script src="../dist/chat-widget.js" defer></script>
   </head>
   <body>
     <div class="container">
@@ -20,20 +22,19 @@
       </div>
     </div>
 
-    <!-- The IIFE bundle built in ../dist (relative to this file) -->
-    <script src="../dist/chat-widget.js"></script>
-    <script>
-      // Mount the widget with options provided by the external site
-      ChatWidget.mount({
-        id: "ext-user-42",
-        theme: { accent: "#0b84ff", bg: "#ffffff" },
-        onSendMessage: async (text, { id }) => {
-          // Simulate a server call; replace with your API call as needed
-          await new Promise(r => setTimeout(r, 200));
-          return `Thanks, ${id}! You said: "${text}"`;
-        }
-      });
-    </script>
+    <!-- Declarative trigger (data attributes) -->
+    <p>
+      <a href="#"
+         data-cw-trigger
+         data-cw-id="ext-user-42"
+         data-cw-accent="#0b84ff"
+         data-cw-bg="#ffffff">Open chat</a>
+    </p>
+
+    <!-- Or custom element variant (auto-replaced with a trigger) -->
+    <p>
+      <chat-widget id="ext-user-42" accent="#0b84ff" bg="#ffffff" label="Need help?"></chat-widget>
+    </p>
   </body>
 </html>
 
