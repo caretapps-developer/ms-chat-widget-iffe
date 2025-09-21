@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "scripts": {
     "build": "node esbuild.config.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "serve": "serve . -p 8080",
+    "dev": "npm run build && npm run serve",
+    "test:widget": "npm run build && serve . -p 8080"
   },
   "dependencies": {
     "react": "^19.1.1",
@@ -19,6 +22,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
+    "serve": "^14.2.4",
     "vite": "^7.1.6"
   }
 }

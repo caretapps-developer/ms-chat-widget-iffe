@@ -23,7 +23,7 @@ export default function ChatWidget({ id, theme = {}, onSendMessage, defaultOpen 
           style={{ backgroundColor: theme.bg || undefined }}
         >
           <div className="cw-header">
-            <span className="cw-title">Minimal Starter Chat Widget</span>
+            <span className="cw-title">Minimal Starter Chat Widget Local or Remote</span>
             <button
               onClick={() => (onRequestClose ? onRequestClose() : setOpen(false))}
               className="cw-close"

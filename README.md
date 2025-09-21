@@ -59,6 +59,12 @@ npm install
 npm run build
 ```
 
+3) Test the widget locally
+```bash
+npm run test:widget
+```
+This builds the widget and starts a local server. Then open http://localhost:8080/test-local.html to test multiple widget configurations.
+
 ---
 
 ## Embedding on any website
@@ -150,8 +156,19 @@ Tips for new widgets:
 ---
 
 ## Testing locally and linting
-- Build: `npm run build`
-- Lint: `npm run lint`
+
+### Quick testing
+- **Test widget**: `npm run test:widget` (builds + serves, then visit test page)
+- **Build and serve**: `npm run dev` (builds + serves on http://localhost:8080)
+- **Just serve**: `npm run serve` (serves existing build)
+
+### Available test pages
+- **Comprehensive test**: http://localhost:8080/test-local.html (multiple widget configurations)
+- **Simple example**: http://localhost:8080/site/host_website/index.html (basic demo)
+
+### Development commands
+- **Build**: `npm run build`
+- **Lint**: `npm run lint`
 
 ---
 
